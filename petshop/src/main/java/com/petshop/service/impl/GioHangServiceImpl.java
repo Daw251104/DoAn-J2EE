@@ -54,4 +54,8 @@ public class GioHangServiceImpl implements GioHangService {
     public void removeCart(Integer cartId) {
         gioHangRepository.deleteById(cartId);
     }
+    @Override
+    public void clearCart(Integer userId){
+        gioHangRepository.deleteAll();
+    }
 }

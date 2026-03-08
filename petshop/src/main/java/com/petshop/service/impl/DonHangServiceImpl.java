@@ -4,44 +4,45 @@
  */
 package com.petshop.service.impl;
 
-import com.petshop.model.*;
-import com.petshop.repository.*;
-
+import com.petshop.model.DonHang;
+import com.petshop.repository.DonHangRepository;
 import com.petshop.service.DonHangService;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DonHangServiceImpl implements DonHangService {
 
-    private final DonHangRepository donHangRepository;
-    private final GioHangRepository gioHangRepository;
-    private final TaiKhoanRepository taiKhoanRepository;
+    private final DonHangRepository repository;
 
-    public DonHangServiceImpl(DonHangRepository donHangRepository,
-                              GioHangRepository gioHangRepository,
-                              TaiKhoanRepository taiKhoanRepository) {
-        this.donHangRepository = donHangRepository;
-        this.gioHangRepository = gioHangRepository;
-        this.taiKhoanRepository = taiKhoanRepository;
+    public DonHangServiceImpl(DonHangRepository repository){
+        this.repository = repository;
     }
 
     @Override
-    public void createOrder(Integer userId) {
+    public List<DonHang> findAll(){
+        return repository.findAll();
+    }
 
-        TaiKhoan user = taiKhoanRepository.findById(userId).orElseThrow();
+    @Override
+    public DonHang findById(Integer id){
+        return repository.findById(id).orElse(null);
+    }
 
-        List<GioHang> carts = gioHangRepository.findByTaiKhoan_MaTK(userId);
+    @Override
+    public DonHang save(DonHang donHang){
+        return repository.save(donHang);
+    }
 
-        DonHang order = new DonHang();
-        order.setKhachHang(user);
-        order.setNgayLapDonHang(LocalDateTime.now());
-        order.setTrangThai("PENDING");
+    @Override
+    public void updateStatus(Integer id,String status){
 
-        donHangRepository.save(order);
+        DonHang donHang = repository.findById(id).orElse(null);
 
-        gioHangRepository.deleteAll(carts);
+        if(donHang != null){
+            donHang.setTrangThai(status);
+            repository.save(donHang);
+        }
+
     }
 }

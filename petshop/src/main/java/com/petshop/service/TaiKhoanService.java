@@ -10,7 +10,17 @@ package com.petshop.service;
  */
 import com.petshop.model.TaiKhoan;
 
+import java.util.List;
+
 public interface TaiKhoanService {
+
+    List<TaiKhoan> findAll();
+
+    TaiKhoan findById(Integer id);
+
+    TaiKhoan save(TaiKhoan taiKhoan);
+
+    void delete(Integer id);
 
     TaiKhoan findByUsername(String username);
 

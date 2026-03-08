@@ -3,16 +3,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.petshop.service;
-import com.petshop.model.DonHang;
+
+import com.petshop.model.SanPham;
 import java.util.List;
 
-public interface DonHangService {
+public interface SanPhamService {
 
-     List<DonHang> findAll();
+    List<SanPham> findAll();
 
-    DonHang findById(Integer id);
+    SanPham findById(Integer id);
 
-    DonHang save(DonHang donHang);
+    SanPham save(SanPham sanPham);
 
-    void updateStatus(Integer id,String status);
+    void delete(Integer id);
+
 }

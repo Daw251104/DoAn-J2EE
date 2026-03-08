@@ -12,7 +12,10 @@ public interface GioHangService {
     List<GioHang> getCart(Integer userId);
 
     void addToCart(Integer userId, Integer productId, Integer quantity);
-
+    
     void removeCart(Integer cartId);
 
+    void clearCart(Integer userId);
+
+   
 }

@@ -6,20 +6,42 @@ package com.petshop.service.impl;
 
 import com.petshop.model.TaiKhoan;
 import com.petshop.repository.TaiKhoanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.petshop.service.TaiKhoanService;
-/**
- *
- * @author datp4
- */
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+
 @Service
 public class TaiKhoanServiceImpl implements TaiKhoanService {
 
-    @Autowired
-    private TaiKhoanRepository repo;
+    private final TaiKhoanRepository repository;
+
+    public TaiKhoanServiceImpl(TaiKhoanRepository repository){
+        this.repository = repository;
+    }
+
     @Override
-    public TaiKhoan findByUsername(String username) {
-        return repo.findByUsername(username);
+    public List<TaiKhoan> findAll(){
+        return repository.findAll();
+    }
+
+    @Override
+    public TaiKhoan findById(Integer id){
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
+    public TaiKhoan save(TaiKhoan taiKhoan){
+        return repository.save(taiKhoan);
+    }
+
+    @Override
+    public void delete(Integer id){
+        repository.deleteById(id);
+    }
+
+    @Override
+    public TaiKhoan findByUsername(String username){
+        return repository.findByUsername(username);
     }
 }

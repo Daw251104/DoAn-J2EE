@@ -6,32 +6,35 @@ package com.petshop.controller.customer;
 
 import com.petshop.model.GioHang;
 import com.petshop.service.GioHangService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/cart")
 public class CartController {
 
-    private final GioHangService gioHangService;
+    private final GioHangService service;
 
-    public CartController(GioHangService gioHangService) {
-        this.gioHangService = gioHangService;
+    public CartController(GioHangService service){
+        this.service = service;
     }
 
-    @GetMapping("/{userId}")
-    public List<GioHang> getCart(@PathVariable Integer userId) {
-        return gioHangService.getCart(userId);
+    @GetMapping
+    public String cart(Model model){
+
+        model.addAttribute("cart",service.getCart(1));
+
+        return "customer/cart";
     }
 
-    @PostMapping("/add")
-    public void addCart(@RequestParam Integer userId,
-                        @RequestParam Integer productId,
-                        @RequestParam Integer quantity) {
+    @GetMapping("/remove/{id}")
+    public String removeCart(@PathVariable Integer id){
 
-        gioHangService.addToCart(userId, productId, quantity);
+        service.removeCart(id);
+
+        return "redirect:/cart";
     }
-
 }

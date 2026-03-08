@@ -4,8 +4,8 @@
  */
 package com.petshop.controller.customer;
 
-import com.petshop.model.DonHang;
-import com.petshop.service.DonHangService;
+import com.petshop.model.TaiKhoan;
+import com.petshop.service.TaiKhoanService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,30 +13,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
 @Controller
-@RequestMapping("/orders")
-public class OrderController {
+@RequestMapping("/profile")
+public class ProfileController {
 
-    private final DonHangService service;
+    private final TaiKhoanService service;
 
-    public OrderController(DonHangService service){
+    public ProfileController(TaiKhoanService service){
         this.service = service;
     }
 
-    @PostMapping("/create")
-    public String create(@ModelAttribute DonHang donHang){
+    @GetMapping
+    public String profile(Model model){
 
-        service.save(donHang);
+        model.addAttribute("user",service.findById(1));
 
-        return "redirect:/orders/history";
+        return "customer/profile";
     }
 
-    @GetMapping("/history")
-    public String history(Model model){
+    @PostMapping("/update")
+    public String update(@ModelAttribute TaiKhoan taiKhoan){
 
-        model.addAttribute("orders",service.findAll());
+        service.save(taiKhoan);
 
-        return "customer/order-history";
+        return "redirect:/profile";
     }
 }

@@ -46,7 +46,7 @@ public class TaiKhoan {
     private LocalDateTime ngayTao;
 
     @ManyToOne
-    @JoinColumn(name = "MALOAITK")
+    @JoinColumn(name = "maloaitk")
     private LoaiTaiKhoan loaiTaiKhoan;
 
     @OneToMany(mappedBy = "khachHang")
