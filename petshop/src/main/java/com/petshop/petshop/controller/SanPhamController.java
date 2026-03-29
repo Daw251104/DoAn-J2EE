@@ -1,5 +1,7 @@
 package com.petshop.petshop.controller;
 
+import com.petshop.petshop.model.LoaiSanPham;
+import com.petshop.petshop.model.LoaiThuCung;
 import com.petshop.petshop.model.SanPham;
 import com.petshop.petshop.repository.LoaiSanPhamRepository;
 import com.petshop.petshop.repository.LoaiThuCungRepository;
@@ -9,11 +11,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.petshop.petshop.dto.SanPhamDTO;
 import com.petshop.petshop.service.service.SanPhamService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Controller
 @RequestMapping("/sanpham")
@@ -33,9 +40,27 @@ public class SanPhamController {
 
     // Xem danh sách sản phẩm (Mọi người đều xem được)
     @GetMapping
-    public String listSanPham(Model model) {
-        List<SanPham> sanPhams = sanPhamRepository.findAll();
-        model.addAttribute("sanPhams", sanPhams);
+    public String listSanPham(@RequestParam(defaultValue = "1") int page,
+                              @RequestParam(required = false) Integer maLoaiTC,
+                              @RequestParam(required = false) Integer maLoai,
+                              Model model) {
+        int pageNumber = page < 1 ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(pageNumber, 10);
+        
+        // filter san pham
+        Page<SanPham> sanPhamPage = sanPhamRepository.locSanPham(maLoaiTC, maLoai, pageable);
+        
+        model.addAttribute("sanPhams", sanPhamPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", sanPhamPage.getTotalPages());
+        model.addAttribute("totalItems", sanPhamPage.getTotalElements());
+        
+        // Pass data for filter form
+        model.addAttribute("loaiSanPhams", loaiSanPhamRepository.findAll());
+        model.addAttribute("loaiThuCungs", loaiThuCungRepository.findAll());
+        model.addAttribute("currentMaLoaiTC", maLoaiTC);
+        model.addAttribute("currentMaLoai", maLoai);
+        
         return "sanpham/index";
     }
 
@@ -114,5 +139,33 @@ public class SanPhamController {
             redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa sản phẩm vì có dữ liệu liên quan!");
         }
         return "redirect:/sanpham";
+    }
+
+    // API thêm nhanh Loại Sản Phẩm
+    @PostMapping("/loai/them")
+    @ResponseBody
+    public ResponseEntity<?> quickAddLoaiSP(@RequestBody Map<String, String> payload) {
+        String tenLoai = payload.get("tenLoai");
+        if (tenLoai == null || tenLoai.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Tên loại không được để trống");
+        }
+        LoaiSanPham loai = new LoaiSanPham();
+        loai.setTenLoai(tenLoai);
+        loai = loaiSanPhamRepository.save(loai);
+        return ResponseEntity.ok(loai);
+    }
+
+    // API thêm nhanh Loại Thú Cưng
+    @PostMapping("/loaitc/them")
+    @ResponseBody
+    public ResponseEntity<?> quickAddLoaiTC(@RequestBody Map<String, String> payload) {
+        String tenLoaiTC = payload.get("tenLoaiTC");
+        if (tenLoaiTC == null || tenLoaiTC.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Tên loại thú cưng không được để trống");
+        }
+        LoaiThuCung loai = new LoaiThuCung();
+        loai.setTenLoaiTC(tenLoaiTC);
+        loai = loaiThuCungRepository.save(loai);
+        return ResponseEntity.ok(loai);
     }
 }

@@ -46,7 +46,8 @@ public class SecurityConfig {
             .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "QUAN_TRI_VIEN")
 
             // Các trang yêu cầu vai trò OWNER hoặc CHU_CUA_HANG
-            .requestMatchers("/owner/**", "/sanpham/them", "/sanpham/sua/**", "/sanpham/xoa/**").hasAnyAuthority("OWNER", "STAFF")
+            .requestMatchers("/owner/**", "/sanpham/them", "/sanpham/sua/**", "/sanpham/xoa/**", 
+                             "/sanpham/loai/them", "/sanpham/loaitc/them").hasAnyAuthority("OWNER", "STAFF")
 
             // Quản lý đơn hàng – OWNER / STAFF
             .requestMatchers("/staff/**").hasAnyAuthority("OWNER", "STAFF")
@@ -61,11 +62,8 @@ public class SecurityConfig {
             .requestMatchers("/thanh-toan", "/thanh-toan/**", "/don-hang", "/don-hang/**")
                 .hasAnyAuthority("CUSTOMER", "KHACH_HANG")
 
-            // Thông tin cá nhân - yều cầu đăng nhập
-            .requestMatchers("/profile/**").authenticated()
-
             // Các trang công khai (permitAll)
-            .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error", "/sanpham").permitAll()
+            .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error", "/sanpham", "/uploads/**").permitAll()
 
             // Bất kỳ yêu cầu nào khác đều cần xác thực
             .anyRequest().authenticated()

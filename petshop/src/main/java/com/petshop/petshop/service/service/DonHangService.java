@@ -31,6 +31,9 @@ public class DonHangService {
     @Autowired
     private PhuongThucThanhToanRepository phuongThucThanhToanRepository;
 
+    @Autowired
+    private SanPhamRepository sanPhamRepository;
+
     /**
      * Tạo đơn hàng từ giỏ hàng.
      */
@@ -53,7 +56,8 @@ public class DonHangService {
                     BigDecimal gia = gh.getSanPham().getGiaBan();
                     if (gh.getSanPham().getKhuyenMai() != null
                             && gh.getSanPham().getKhuyenMai().compareTo(BigDecimal.ZERO) > 0) {
-                        gia = gia.subtract(gh.getSanPham().getKhuyenMai());
+                        BigDecimal kmPerc = gh.getSanPham().getKhuyenMai().divide(BigDecimal.valueOf(100));
+                        gia = gia.multiply(BigDecimal.ONE.subtract(kmPerc));
                     }
                     return gia.multiply(BigDecimal.valueOf(gh.getSoLuong()));
                 })
@@ -82,7 +86,8 @@ public class DonHangService {
             BigDecimal giaBanRa = gh.getSanPham().getGiaBan();
             if (gh.getSanPham().getKhuyenMai() != null
                     && gh.getSanPham().getKhuyenMai().compareTo(BigDecimal.ZERO) > 0) {
-                giaBanRa = giaBanRa.subtract(gh.getSanPham().getKhuyenMai());
+                BigDecimal kmPerc = gh.getSanPham().getKhuyenMai().divide(BigDecimal.valueOf(100));
+                giaBanRa = giaBanRa.multiply(BigDecimal.ONE.subtract(kmPerc));
             }
             chiTiet.setGiaBanRa(giaBanRa);
             chiTietDonHangRepository.save(chiTiet);
@@ -97,11 +102,16 @@ public class DonHangService {
     /**
      * Lấy lịch sử đơn hàng của user.
      */
-    public List<DonHangResponse> layDanhSachDonHang(String username) {
+    public List<DonHangResponse> layDanhSachDonHang(String username, String trangThai) {
         TaiKhoan taiKhoan = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản: " + username));
-        return donHangRepository.findByKhachHangOrderByNgayLapDonHangDesc(taiKhoan)
-                .stream()
+        List<DonHang> danhSach = donHangRepository.findByKhachHangOrderByNgayLapDonHangDesc(taiKhoan);
+        if (trangThai != null && !trangThai.trim().isEmpty()) {
+            danhSach = danhSach.stream()
+                    .filter(d -> trangThai.equals(d.getTrangThai()))
+                    .collect(Collectors.toList());
+        }
+        return danhSach.stream()
                 .map(DonHangResponse::from)
                 .collect(Collectors.toList());
     }
@@ -125,8 +135,14 @@ public class DonHangService {
     /**
      * Lấy tất cả đơn hàng (OWNER/STAFF).
      */
-    public List<DonHangResponse> layTatCaDonHang() {
-        return donHangRepository.findAll().stream()
+    public List<DonHangResponse> layTatCaDonHang(String trangThai) {
+        List<DonHang> danhSach = donHangRepository.findAll();
+        if (trangThai != null && !trangThai.trim().isEmpty()) {
+            danhSach = danhSach.stream()
+                    .filter(d -> trangThai.equals(d.getTrangThai()))
+                    .collect(Collectors.toList());
+        }
+        return danhSach.stream()
                 .sorted((a, b) -> b.getNgayLapDonHang().compareTo(a.getNgayLapDonHang()))
                 .map(DonHangResponse::from)
                 .collect(Collectors.toList());
@@ -200,6 +216,41 @@ public class DonHangService {
         }
 
         donHang.setTrangThai("DA_GIAO");
+        donHang.setDaThanhToan(1);
+        
+        // Giảm số lượng tồn kho của từng sản phẩm trong đơn hàng
+        if (donHang.getChiTietDonHangs() != null) {
+            for (ChiTietDonHang ct : donHang.getChiTietDonHangs()) {
+                SanPham sp = ct.getSanPham();
+                int slConLai = (sp.getSlTon() != null ? sp.getSlTon() : 0) - ct.getSl();
+                if (slConLai < 0) {
+                    slConLai = 0; // Tránh số lượng tồn âm
+                }
+                sp.setSlTon(slConLai);
+                sanPhamRepository.save(sp);
+            }
+        }
+        
+        donHangRepository.save(donHang);
+    }
+
+    /**
+     * Khách hàng hủy đơn ở trạng thái CHO_XAC_NHAN
+     */
+    @Transactional
+    public void huyDonHang(Integer maDH, String username) {
+        DonHang donHang = donHangRepository.findById(maDH)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng: " + maDH));
+
+        if (!donHang.getKhachHang().getUsername().equals(username)) {
+            throw new RuntimeException("Bạn không có quyền cập nhật đơn hàng này!");
+        }
+
+        if (!"CHO_XAC_NHAN".equals(donHang.getTrangThai())) {
+            throw new RuntimeException("Đơn hàng không ở trạng thái chờ xác nhận, không thể hủy!");
+        }
+
+        donHang.setTrangThai("DA_HUY");
         donHangRepository.save(donHang);
     }
 }
