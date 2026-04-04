@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" layout:decorate="~{layout}">
 
 <head>
     <meta charset="UTF-8">
@@ -670,382 +670,333 @@
 </head>
 
 <body>
+    <th:block layout:fragment="content">
+        <!-- Page -->
+        <div class="page-wrap">
 
-    <div class="topbar">🐾 PetShop – Quản lý sản phẩm</div>
-
-    <!-- Navbar -->
-    <header class="navbar">
-        <nav class="navbar-inner">
-            <a th:href="@{/}" class="brand">
-                <div class="li">🐾</div>
-                <span class="lt">PetShop</span>
-            </a>
-            <div class="breadcrumb">
-                <span class="bc-sep">/</span>
-                <a th:href="@{/sanpham}">Sản phẩm</a>
-                <span class="bc-sep">/</span>
-                <span th:text="${sanPham.maSP == null ? 'Thêm mới' : 'Chỉnh sửa'}">Form</span>
+            <!-- Header -->
+            <div class="form-header">
+                <div class="fh-icon" th:text="${sanPham.maSP == null ? '✨' : '✏️'}">✨</div>
+                <div>
+                    <h1 th:text="${sanPham.maSP == null ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}">Form</h1>
+                    <p
+                        th:text="${sanPham.maSP == null ? 'Điền thông tin để tạo sản phẩm mới cho cửa hàng' : 'Cập nhật thông tin sản phẩm #' + sanPham.maSP}">
+                        Mô tả</p>
+                </div>
             </div>
-            <div class="spacer"></div>
-            <a th:href="@{/sanpham}"
-                style="display:flex;align-items:center;gap:6px;color:var(--gray-600);font-size:.85rem;font-weight:700;text-decoration:none;padding:8px 14px;border-radius:50px;border:1.5px solid var(--gray-200);transition:all .2s"
-                onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background=''">
-                <i class="bi bi-arrow-left"></i> Danh sách
-            </a>
-        </nav>
-    </header>
 
-    <!-- Page -->
-    <div class="page-wrap">
+            <div class="form-card">
+                <form th:action="@{${sanPham.maSP == null ? '/sanpham/them' : '/sanpham/sua/' + sanPham.maSP}}"
+                    th:object="${sanPham}" method="post" enctype="multipart/form-data" id="productForm">
+                    <input type="hidden" th:field="*{maSP}">
 
-        <!-- Header -->
-        <div class="form-header">
-            <div class="fh-icon" th:text="${sanPham.maSP == null ? '✨' : '✏️'}">✨</div>
-            <div>
-                <h1 th:text="${sanPham.maSP == null ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}">Form</h1>
-                <p
-                    th:text="${sanPham.maSP == null ? 'Điền thông tin để tạo sản phẩm mới cho cửa hàng' : 'Cập nhật thông tin sản phẩm #' + sanPham.maSP}">
-                    Mô tả</p>
-            </div>
-        </div>
-
-        <div class="form-card">
-            <form th:action="@{${sanPham.maSP == null ? '/sanpham/them' : '/sanpham/sua/' + sanPham.maSP}}"
-                th:object="${sanPham}" method="post" enctype="multipart/form-data" id="productForm">
-                <input type="hidden" th:field="*{maSP}">
-
-                <!-- Section 1: Basic info -->
-                <div class="fsection">
-                    <div class="section-title">
-                        <i class="bi bi-info-circle-fill"></i> Thông tin cơ bản
-                    </div>
-
-                    <!-- Product name -->
-                    <div class="fgroup full">
-                        <label><i class="bi bi-tag-fill"></i> Tên sản phẩm <span class="req">*</span></label>
-                        <div class="iw">
-                            <i class="bi bi-tag-fill ii"></i>
-                            <input type="text" th:field="*{tenSP}" placeholder="Nhập tên sản phẩm..." required>
+                    <!-- Section 1: Basic info -->
+                    <div class="fsection">
+                        <div class="section-title">
+                            <i class="bi bi-info-circle-fill"></i> Thông tin cơ bản
                         </div>
-                    </div>
 
-                    <div class="fgrid">
-                        <!-- Product type -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-grid-fill"></i> Loại sản phẩm <span class="req">*</span></label>
-                            <div class="fgroup-wc">
-                                <div class="iw sw">
-                                    <i class="bi bi-grid-fill ii"></i>
-                                    <select th:field="*{maLoai}" required id="maLoaiSelect">
-                                        <option value="">-- Chọn loại sản phẩm --</option>
-                                        <option th:each="loai : ${loaiSanPhams}" th:value="${loai.maLoai}"
-                                            th:text="${loai.tenLoai}"></option>
-                                    </select>
+                        <!-- Product name -->
+                        <div class="fgroup full">
+                            <label><i class="bi bi-tag-fill"></i> Tên sản phẩm <span class="req">*</span></label>
+                            <div class="iw">
+                                <i class="bi bi-tag-fill ii"></i>
+                                <input type="text" th:field="*{tenSP}" placeholder="Nhập tên sản phẩm..." required>
+                            </div>
+                        </div>
+
+                        <div class="fgrid">
+                            <!-- Product type -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-grid-fill"></i> Loại sản phẩm <span class="req">*</span></label>
+                                <div class="fgroup-wc">
+                                    <div class="iw sw">
+                                        <i class="bi bi-grid-fill ii"></i>
+                                        <select th:field="*{maLoai}" required id="maLoaiSelect">
+                                            <option value="">-- Chọn loại sản phẩm --</option>
+                                            <option th:each="loai : ${loaiSanPhams}" th:value="${loai.maLoai}"
+                                                th:text="${loai.tenLoai}"></option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn-quick-add" onclick="openQuickAdd('LOAI_SP')"
+                                        title="Thêm loại mới">+</button>
                                 </div>
-                                <button type="button" class="btn-quick-add" onclick="openQuickAdd('LOAI_SP')"
-                                    title="Thêm loại mới">+</button>
                             </div>
-                        </div>
-                        <!-- Pet type -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-heart-fill"></i> Dành cho thú cưng <span class="req">*</span></label>
-                            <div class="fgroup-wc">
-                                <div class="iw sw">
-                                    <i class="bi bi-heart-fill ii"></i>
-                                    <select th:field="*{maLoaiTC}" required id="maLoaiTCSelect">
-                                        <option value="">-- Chọn loại thú cưng --</option>
-                                        <option th:each="tc : ${loaiThuCungs}" th:value="${tc.maLoaiTC}"
-                                            th:text="${tc.tenLoaiTC}"></option>
-                                    </select>
+                            <!-- Pet type -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-heart-fill"></i> Dành cho thú cưng <span
+                                        class="req">*</span></label>
+                                <div class="fgroup-wc">
+                                    <div class="iw sw">
+                                        <i class="bi bi-heart-fill ii"></i>
+                                        <select th:field="*{maLoaiTC}" required id="maLoaiTCSelect">
+                                            <option value="">-- Chọn loại thú cưng --</option>
+                                            <option th:each="tc : ${loaiThuCungs}" th:value="${tc.maLoaiTC}"
+                                                th:text="${tc.tenLoaiTC}"></option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn-quick-add" onclick="openQuickAdd('LOAI_TC')"
+                                        title="Thêm loại thú cưng">+</button>
                                 </div>
-                                <button type="button" class="btn-quick-add" onclick="openQuickAdd('LOAI_TC')"
-                                    title="Thêm loại thú cưng">+</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Section 2: Price & stock -->
-                <div class="fsection">
-                    <div class="section-title">
-                        <i class="bi bi-currency-dollar"></i> Giá & Kho hàng
+                    <!-- Section 2: Price & stock -->
+                    <div class="fsection">
+                        <div class="section-title">
+                            <i class="bi bi-currency-dollar"></i> Giá & Kho hàng
+                        </div>
+                        <div class="fgrid">
+                            <!-- Price -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-currency-exchange"></i> Giá bán (VNĐ) <span
+                                        class="req">*</span></label>
+                                <div class="iw">
+                                    <i class="bi bi-currency-exchange ii"></i>
+                                    <input type="number" th:field="*{giaBan}" placeholder="150000" min="0" required
+                                        oninput="formatPrice(this)">
+                                </div>
+                                <div class="input-hint" id="priceDisplay">Nhập giá bán</div>
+                            </div>
+                            <!-- Stock -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-box-seam-fill"></i> Số lượng tồn <span
+                                        class="req">*</span></label>
+                                <div class="iw">
+                                    <i class="bi bi-box-seam-fill ii"></i>
+                                    <input type="number" th:field="*{slTon}" placeholder="100" min="0" required>
+                                </div>
+                            </div>
+                            <!-- Discount -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-percent"></i> Khuyến mãi (%)</label>
+                                <div class="iw">
+                                    <i class="bi bi-percent ii"></i>
+                                    <input type="number" th:field="*{khuyenMai}" placeholder="0" min="0" max="100"
+                                        step="1">
+                                </div>
+                            </div>
+                            <!-- Status -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-toggle-on"></i> Trạng thái bán</label>
+                                <div class="status-row">
+                                    <label class="status-opt">
+                                        <input type="radio" name="tinhTrang" th:value="1"
+                                            th:checked="${sanPham.tinhTrang == 1 or sanPham.tinhTrang == null}">
+                                        <div class="so-emoji">✅</div>
+                                        <div class="so-label">Đang bán</div>
+                                    </label>
+                                    <label class="status-opt">
+                                        <input type="radio" name="tinhTrang" th:value="0"
+                                            th:checked="${sanPham.tinhTrang == 0}">
+                                        <div class="so-emoji">⛔</div>
+                                        <div class="so-label">Ngừng bán</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="fgrid">
-                        <!-- Price -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-currency-exchange"></i> Giá bán (VNĐ) <span
-                                    class="req">*</span></label>
+
+                    <!-- Section 3: Images -->
+                    <div class="fsection">
+                        <div class="section-title">
+                            <i class="bi bi-images"></i> Hình ảnh sản phẩm
+                        </div>
+                        <div class="fgrid">
+                            <!-- Main image -->
+                            <div class="fgroup">
+                                <label><i class="bi bi-image-fill"></i> Ảnh đại diện</label>
+                                <div class="img-upload-area" id="mainUploadArea">
+                                    <input type="file" id="hinhDaiDien" name="hinhDaiDien" accept="image/*"
+                                        onchange="previewMain(this)">
+                                    <div class="upload-icon" id="mainUploadIcon">🌸</div>
+                                    <div class="upload-label">Nhấn hoặc kéo thả ảnh</div>
+                                    <div class="upload-hint">PNG, JPG tối đa 5MB</div>
+                                </div>
+
+
+                            </div>
+                            <div class="fgroup">
+                                <!-- Current image -->
+                                <div class="current-img-wrap"
+                                    th:if="${oldHinhDaiDien != null and !oldHinhDaiDien.isEmpty()}">
+                                    <div class="current-img-label">Ảnh hiện tại:</div>
+                                    <img th:src="${oldHinhDaiDien}" alt="Ảnh hiện tại" class="current-img"
+                                        id="mainPreview">
+                                </div>
+                                <div class="current-img-wrap" id="mainPreviewWrap" style="display:none;"
+                                    th:unless="${oldHinhDaiDien != null and !oldHinhDaiDien.isEmpty()}">
+                                    <div class="current-img-label">Ảnh tải lên:</div>
+                                    <img id="mainPreviewNew" alt="Preview" class="current-img">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Description -->
+                    <div class="fsection">
+                        <div class="section-title"><i class="bi bi-file-text-fill"></i> Mô tả sản phẩm</div>
+                        <div class="fgroup full">
+                            <label><i class="bi bi-pencil-fill"></i> Mô tả chi tiết</label>
                             <div class="iw">
-                                <i class="bi bi-currency-exchange ii"></i>
-                                <input type="number" th:field="*{giaBan}" placeholder="150000" min="0" required
-                                    oninput="formatPrice(this)">
-                            </div>
-                            <div class="input-hint" id="priceDisplay">Nhập giá bán</div>
-                        </div>
-                        <!-- Stock -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-box-seam-fill"></i> Số lượng tồn <span class="req">*</span></label>
-                            <div class="iw">
-                                <i class="bi bi-box-seam-fill ii"></i>
-                                <input type="number" th:field="*{slTon}" placeholder="100" min="0" required>
-                            </div>
-                        </div>
-                        <!-- Discount -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-percent"></i> Khuyến mãi (%)</label>
-                            <div class="iw">
-                                <i class="bi bi-percent ii"></i>
-                                <input type="number" th:field="*{khuyenMai}" placeholder="0" min="0" max="100" step="1">
-                            </div>
-                        </div>
-                        <!-- Status -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-toggle-on"></i> Trạng thái bán</label>
-                            <div class="status-row">
-                                <label class="status-opt">
-                                    <input type="radio" name="tinhTrang" th:value="1"
-                                        th:checked="${sanPham.tinhTrang == 1 or sanPham.tinhTrang == null}">
-                                    <div class="so-emoji">✅</div>
-                                    <div class="so-label">Đang bán</div>
-                                </label>
-                                <label class="status-opt">
-                                    <input type="radio" name="tinhTrang" th:value="0"
-                                        th:checked="${sanPham.tinhTrang == 0}">
-                                    <div class="so-emoji">⛔</div>
-                                    <div class="so-label">Ngừng bán</div>
-                                </label>
+                                <i class="bi bi-pencil-fill ii" style="top:16px;transform:none;"></i>
+                                <textarea th:field="*{moTa}" rows="5"
+                                    placeholder="Nhập mô tả chi tiết về sản phẩm này..."></textarea>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Section 3: Images -->
-                <div class="fsection">
-                    <div class="section-title">
-                        <i class="bi bi-images"></i> Hình ảnh sản phẩm
-                    </div>
-                    <div class="fgrid">
-                        <!-- Main image -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-image-fill"></i> Ảnh đại diện</label>
-                            <div class="img-upload-area" id="mainUploadArea">
-                                <input type="file" id="hinhDaiDien" name="hinhDaiDien" accept="image/*"
-                                    onchange="previewMain(this)">
-                                <div class="upload-icon" id="mainUploadIcon">🌸</div>
-                                <div class="upload-label">Nhấn hoặc kéo thả ảnh</div>
-                                <div class="upload-hint">PNG, JPG tối đa 5MB</div>
-                            </div>
-                            <!-- Current image -->
-                            <div class="current-img-wrap"
-                                th:if="${oldHinhDaiDien != null and !oldHinhDaiDien.isEmpty()}">
-                                <div class="current-img-label">Ảnh hiện tại:</div>
-                                <img th:src="${oldHinhDaiDien}" alt="Ảnh hiện tại" class="current-img" id="mainPreview">
-                            </div>
-                            <div class="current-img-wrap" id="mainPreviewWrap" style="display:none;"
-                                th:unless="${oldHinhDaiDien != null and !oldHinhDaiDien.isEmpty()}">
-                                <div class="current-img-label">Ảnh tải lên:</div>
-                                <img id="mainPreviewNew" alt="Preview" class="current-img">
-                            </div>
-                        </div>
-                        <!-- Extra images -->
-                        <div class="fgroup">
-                            <label><i class="bi bi-collection-fill"></i> Hình ảnh phụ (nhiều ảnh)</label>
-                            <div class="img-upload-area">
-                                <input type="file" id="hinhAnhs" name="hinhAnhs" accept="image/*" multiple>
-                                <div class="upload-icon">🖼️</div>
-                                <div class="upload-label">Chọn nhiều ảnh</div>
-                                <div class="upload-hint">Giữ Ctrl/Cmd để chọn nhiều file</div>
-                            </div>
+                    <!-- Actions -->
+                    <div class="form-footer-actions">
+                        <span class="req-note"><span style="color:var(--rose)">*</span> Trường bắt buộc</span>
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <a th:href="@{/sanpham}" class="btn-back">
+                                <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span th:text="${sanPham.maSP == null ? 'Thêm sản phẩm' : 'Lưu thay đổi'}">Lưu</span>
+                            </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Section 4: Description -->
-                <div class="fsection">
-                    <div class="section-title"><i class="bi bi-file-text-fill"></i> Mô tả sản phẩm</div>
-                    <div class="fgroup full">
-                        <label><i class="bi bi-pencil-fill"></i> Mô tả chi tiết</label>
-                        <div class="iw">
-                            <i class="bi bi-pencil-fill ii" style="top:16px;transform:none;"></i>
-                            <textarea th:field="*{moTa}" rows="5"
-                                placeholder="Nhập mô tả chi tiết về sản phẩm này..."></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="form-footer-actions">
-                    <span class="req-note"><span style="color:var(--rose)">*</span> Trường bắt buộc</span>
-                    <div style="display:flex;gap:12px;align-items:center;">
-                        <a th:href="@{/sanpham}" class="btn-back">
-                            <i class="bi bi-arrow-left"></i> Quay lại
-                        </a>
-                        <button type="submit" class="btn-save">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span th:text="${sanPham.maSP == null ? 'Thêm sản phẩm' : 'Lưu thay đổi'}">Lưu</span>
-                        </button>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <footer class="site-footer">
-        © 2025 PetShop 🐾 — Hệ thống quản lý sản phẩm
-    </footer>
-
-    <!-- Quick Add Modal -->
-    <div class="modal-overlay" id="quickAddModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Thêm mới</h2>
-                <p id="modalDesc">Nhập tên để thêm vào danh sách</p>
-            </div>
-            <div class="fgroup full" style="margin-bottom:0">
-                <div class="iw">
-                    <i class="bi bi-plus-circle-fill ii"></i>
-                    <input type="text" id="quickAddInput" placeholder="Nhập tên tại đây...">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="modal-btn btn-cancel" onclick="closeQuickAdd()">Hủy bỏ</button>
-                <button type="button" class="modal-btn btn-confirm" id="btnConfirmQuickAdd">Thêm ngay</button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <script>
-        let currentQuickAddType = '';
+        <script>
+            let currentQuickAddType = '';
 
-        function openQuickAdd(type) {
-            currentQuickAddType = type;
-            const modal = document.getElementById('quickAddModal');
-            const title = document.getElementById('modalTitle');
-            const desc = document.getElementById('modalDesc');
-            const input = document.getElementById('quickAddInput');
+            function openQuickAdd(type) {
+                currentQuickAddType = type;
+                const modal = document.getElementById('quickAddModal');
+                const title = document.getElementById('modalTitle');
+                const desc = document.getElementById('modalDesc');
+                const input = document.getElementById('quickAddInput');
 
-            if (type === 'LOAI_SP') {
-                title.textContent = 'Thêm Loại Sản Phẩm';
-                desc.textContent = 'Ví dụ: Thức ăn khô, Đồ chơi, Phụ kiện...';
-            } else {
-                title.textContent = 'Thêm Loại Thú Cưng';
-                desc.textContent = 'Ví dụ: Hamster, Chim cảnh, Bò sát...';
-            }
-
-            input.value = '';
-            modal.style.display = 'flex';
-            input.focus();
-        }
-
-        function closeQuickAdd() {
-            document.getElementById('quickAddModal').style.display = 'none';
-        }
-
-        document.getElementById('btnConfirmQuickAdd').addEventListener('click', async () => {
-            const input = document.getElementById('quickAddInput');
-            const name = input.value.trim();
-            if (!name) {
-                alert('Vui lòng nhập tên!');
-                return;
-            }
-
-            // Get CSRF Token
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-            const endpoint = currentQuickAddType === 'LOAI_SP' ? '/sanpham/loai/them' : '/sanpham/loaitc/them';
-            const payload = currentQuickAddType === 'LOAI_SP' ? { tenLoai: name } : { tenLoaiTC: name };
-
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const selectId = currentQuickAddType === 'LOAI_SP' ? 'maLoaiSelect' : 'maLoaiTCSelect';
-                    const select = document.getElementById(selectId);
-
-                    const newOption = document.createElement('option');
-                    newOption.value = currentQuickAddType === 'LOAI_SP' ? data.maLoai : data.maLoaiTC;
-                    newOption.textContent = currentQuickAddType === 'LOAI_SP' ? data.tenLoai : data.tenLoaiTC;
-                    newOption.selected = true;
-
-                    select.appendChild(newOption);
-                    closeQuickAdd();
+                if (type === 'LOAI_SP') {
+                    title.textContent = 'Thêm Loại Sản Phẩm';
+                    desc.textContent = 'Ví dụ: Thức ăn khô, Đồ chơi, Phụ kiện...';
                 } else {
-                    const err = await response.text();
-                    alert('Lỗi: ' + err);
+                    title.textContent = 'Thêm Loại Thú Cưng';
+                    desc.textContent = 'Ví dụ: Hamster, Chim cảnh, Bò sát...';
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi kết nối máy chủ!');
-            }
-        });
 
-        /* Existing scripts */
-        /* Format price display */
-        function formatPrice(input) {
-            const val = parseInt(input.value) || 0;
-            const display = document.getElementById('priceDisplay');
-            if (val > 0) {
-                display.textContent = '≈ ' + val.toLocaleString('vi-VN') + ' đồng';
-                display.style.color = 'var(--rose)';
-            } else {
-                display.textContent = 'Nhập giá bán';
-                display.style.color = 'var(--gray-400)';
+                input.value = '';
+                modal.style.display = 'flex';
+                input.focus();
             }
-        }
-        /* Init price display */
-        (() => {
-            const pi = document.querySelector('input[name="giaBan"]');
-            if (pi && pi.value) formatPrice(pi);
-        })();
 
-        /* Preview main image */
-        function previewMain(input) {
-            if (!input.files || !input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                // If existing img shown, update it
-                const cur = document.getElementById('mainPreview');
-                if (cur) { cur.src = e.target.result; return; }
-                // Otherwise show new preview area
-                const wrap = document.getElementById('mainPreviewWrap');
-                const img = document.getElementById('mainPreviewNew');
-                if (wrap && img) {
-                    img.src = e.target.result;
-                    wrap.style.display = 'block';
-                    document.getElementById('mainUploadIcon').textContent = '✅';
+            function closeQuickAdd() {
+                document.getElementById('quickAddModal').style.display = 'none';
+            }
+
+            document.getElementById('btnConfirmQuickAdd').addEventListener('click', async () => {
+                const input = document.getElementById('quickAddInput');
+                const name = input.value.trim();
+                if (!name) {
+                    alert('Vui lòng nhập tên!');
+                    return;
                 }
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
 
-        /* Drag-and-drop highlight */
-        document.querySelectorAll('.img-upload-area').forEach(area => {
-            area.addEventListener('dragover', e => {
-                e.preventDefault();
-                area.style.borderColor = 'var(--rose)';
-                area.style.background = 'var(--pink-100)';
+                // Get CSRF Token
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+                const endpoint = currentQuickAddType === 'LOAI_SP' ? '/sanpham/loai/them' : '/sanpham/loaitc/them';
+                const payload = currentQuickAddType === 'LOAI_SP' ? { tenLoai: name } : { tenLoaiTC: name };
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const selectId = currentQuickAddType === 'LOAI_SP' ? 'maLoaiSelect' : 'maLoaiTCSelect';
+                        const select = document.getElementById(selectId);
+
+                        const newOption = document.createElement('option');
+                        newOption.value = currentQuickAddType === 'LOAI_SP' ? data.maLoai : data.maLoaiTC;
+                        newOption.textContent = currentQuickAddType === 'LOAI_SP' ? data.tenLoai : data.tenLoaiTC;
+                        newOption.selected = true;
+
+                        select.appendChild(newOption);
+                        closeQuickAdd();
+                    } else {
+                        const err = await response.text();
+                        alert('Lỗi: ' + err);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi kết nối máy chủ!');
+                }
             });
-            area.addEventListener('dragleave', () => {
-                area.style.borderColor = '';
-                area.style.background = '';
+
+            /* Existing scripts */
+            /* Format price display */
+            function formatPrice(input) {
+                const val = parseInt(input.value) || 0;
+                const display = document.getElementById('priceDisplay');
+                if (val > 0) {
+                    display.textContent = '≈ ' + val.toLocaleString('vi-VN') + ' đồng';
+                    display.style.color = 'var(--rose)';
+                } else {
+                    display.textContent = 'Nhập giá bán';
+                    display.style.color = 'var(--gray-400)';
+                }
+            }
+            /* Init price display */
+            (() => {
+                const pi = document.querySelector('input[name="giaBan"]');
+                if (pi && pi.value) formatPrice(pi);
+            })();
+
+            /* Preview main image */
+            function previewMain(input) {
+                if (!input.files || !input.files[0]) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    // If existing img shown, update it
+                    const cur = document.getElementById('mainPreview');
+                    if (cur) { cur.src = e.target.result; return; }
+                    // Otherwise show new preview area
+                    const wrap = document.getElementById('mainPreviewWrap');
+                    const img = document.getElementById('mainPreviewNew');
+                    if (wrap && img) {
+                        img.src = e.target.result;
+                        wrap.style.display = 'block';
+                        document.getElementById('mainUploadIcon').textContent = '✅';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+
+            /* Drag-and-drop highlight */
+            document.querySelectorAll('.img-upload-area').forEach(area => {
+                area.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    area.style.borderColor = 'var(--rose)';
+                    area.style.background = 'var(--pink-100)';
+                });
+                area.addEventListener('dragleave', () => {
+                    area.style.borderColor = '';
+                    area.style.background = '';
+                });
+                area.addEventListener('drop', e => {
+                    e.preventDefault();
+                    area.style.borderColor = '';
+                    area.style.background = '';
+                });
             });
-            area.addEventListener('drop', e => {
-                e.preventDefault();
-                area.style.borderColor = '';
-                area.style.background = '';
-            });
-        });
-    </script>
+        </script>
+    </th:block>
 </body>
 
 </html>
